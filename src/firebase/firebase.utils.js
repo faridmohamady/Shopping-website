@@ -3,16 +3,17 @@ import 'firebase/firestore';
 import 'firebase/auth';
 
 const config = {
-    apiKey: "AIzaSyBHQ9dpaxfMsMnh6dgRYVIUkUMzslDy_h0",
-    authDomain: "shopping-website-db.firebaseapp.com",
-    databaseURL: "https://shopping-website-db.firebaseio.com",
-    projectId: "shopping-website-db",
-    storageBucket: "shopping-website-db.appspot.com",
-    messagingSenderId: "150967726232",
-    appId: "1:150967726232:web:8ab56faf90f18536a920ed",
-    measurementId: "G-H2005LFS0J"
+  apiKey: "AIzaSyBEdLGKYPniFtWSKEEe-xVbeW8sSZUJGDw",
+  authDomain: "shopping-website-295623.firebaseapp.com",
+  databaseURL: "https://shopping-website-295623.firebaseio.com",
+  projectId: "shopping-website-295623",
+  storageBucket: "shopping-website-295623.appspot.com",
+  messagingSenderId: "822205058837",
+  appId: "1:822205058837:web:0da61a7d9bab520c04231c",
+  measurementId: "G-3VGCT1FR7Q"
   }
 
+  firebase.initializeApp(config);
   export const createUserProfileDocument = async (userAuth, additionalData) => {
     if(!userAuth) return;
 
@@ -37,7 +38,34 @@ const config = {
     return userRef; 
   }
 
-  firebase.initializeApp(config);
+
+  export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+    const collectionRef = firestore.collection(collectionKey)
+    const batch = firestore.batch();
+    objectsToAdd.forEach(obj => {
+      const newDocRef = collectionRef.doc();
+      batch.set(newDocRef, obj);
+    })
+    return await batch.commit();
+  }
+
+  export const convertCollectionsSnapshotToMap = collections => {
+    const transformedCollection = collections.docs.map(doc => {
+      const {title, items} = doc.data();
+
+      return{
+        routeName: encodeURI(title.toLowerCase()),
+        id: doc.id,
+        title,
+        items
+      }
+    })
+
+    return transformedCollection.reduce((accumulator, collection)=>{
+      accumulator[collection.title.toLowerCase()] = collection;
+      return accumulator;
+    }, {})
+  }
 
   export const auth = firebase.auth();
   export const firestore = firebase.firestore();
